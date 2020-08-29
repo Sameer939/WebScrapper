@@ -74,8 +74,6 @@ def flipkart(product_name):
 #                     print(site, name, price, url, prod_url)
                 except:
                     pass
-        for i,f in enumerate(flipkart_details):
-            print(F"{i}). {f}\n\n")
         return True
 
 def amazon(product_name):
@@ -85,61 +83,28 @@ def amazon(product_name):
 
         url = "https://www.amazon.in/"
         query = "s?k=" + product_name
-        url = url + query
+        # url = url + query
 
         header = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
         r = requests.get(url, headers = header)
 
-        driver = BeautifulSoup(r.content,features="html5lib")
+        driver = BeautifulSoup(r.content,"html5lib")
 
 
         amazon_details = []
-        with open("a.txt", "w", encoding="utf-8") as f:
-            f.write(driver.prettify())
 
-        for mob in driver.find_all(class="s-main-slot"):
-            try:
-                name = mob.find('h2', class_ = 'a-size-base').text.strip()
-                price = mob.find('span', class_ = 'a-size-base').text.strip()
-                try:
-                    prod_url = mob.find(class_ = 'a-link-normal')
+        if driver.find_all(class_='s-main-slot'):
+            for i,mob in enumerate(driver.find_all(class_='s-result-item')):
+                if not mob.find(class_='a-price-whole') is None:
+                    price = mob.find(class_='a-price-whole').text.strip()
+                    name = mob.find(class_="a-size-medium a-color-base a-text-normal").text.strip()
+                    prod_url = mob.find(class_='a-link-normal')
                     prod_url = prod_url.attrs['href']
-                    if re.search('url=https', prod_url):
-                        prod_url = "https://www.amazon.in" + prod_url
-                except:
-                    prod_url = ''
-                try:
-                    url = mob.find('img')
-                    url = url.attrs['src']
-                except:
-                    url = ''
-                amazon_details.append([name, price, site, url, prod_url])
-#                 print(site, name, price, prod_url)
-            except:
-                try:
-                    name = mob.find('h2', class_ = 'a-size-medium').text.strip()
-                    price = mob.find('span', class_ = 'a-size-base').text.strip()
-                    try:
-                        prod_url = mob.find(class_ = 'a-link-normal')
-                        prod_url = prod_url.attrs['href']
-                        if re.search('url=https', prod_url):
-                            prod_url = "https://www.amazon.in" + prod_url
-                    except:
-                        prod_url = ''
-                    try:
-                        url = mob.find('img')
-                        url = url.attrs['src']
-                    except:
-                        url = ''
-                    amazon_details.append([name, price, site, url, prod_url])
-#                     print(site, name, price, prod_url)
-                except:
-                    pass
-        for i,k in enumerate(amazon_details):
-            print(F'{i}). {k}\n\n')
-        return True
+                    prod_url = "https://www.amazon.in" + prod_url
+                    # print(name,price,"link = ",prod_url)
+                    amazon_details.append([name,price,'','',url])
+
 
 k = input()
-# flipkart(k)
-print("AMAZON !!!!\n\n")
+flipkart(k)
 amazon(k)
